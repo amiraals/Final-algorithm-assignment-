@@ -34,3 +34,35 @@ def generate_random_posts(n):
         post = Post(post_datetime, content, user, views)
         posts.append(post)
     return posts
+
+
+def display_all_posts(posts):
+    if posts:
+        for post in posts:
+            print(post)
+    else:
+        print("No posts available.")
+
+def run_menu(post_dict, post_bst, max_heap, posts):
+    while True:
+        print("\nSocial Media posts management:")
+        print("1. Display all posts")
+        print("2. Find posts in datetime range")
+        print("3. Get post with most views")
+        print("4. Find post by datetime")
+        print("5. Exit")
+
+        choice = input("Enter your choice (1-5): ")
+        if choice == '1':
+            display_all_posts(posts)
+        elif choice == '2':
+            # call function 
+        elif choice == '3':
+            # call function 
+        elif choice == '4':
+            # call function 
+        elif choice == '5':
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice, please enter a number between 1 and 5.")
