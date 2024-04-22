@@ -1,5 +1,6 @@
 import heapq
 import matplotlib.pyplot as plt
+import networkx as nx
 
 class Intersections:
     def __init__(self, intersectionID):
@@ -65,9 +66,11 @@ class RoadNetworks:
         distances = {}
         for intersectionID in self.intersections:
             distances[intersectionID] = float('inf')
+        for houseID in self.houses:
+            distances[houseID] = float('inf')
         distances[sourceIntersectID] = 0
-
         priorityQ = [(0, sourceIntersectID)]
+
         while priorityQ:
             distU, u = heapq.heappop(priorityQ)
             if distU > distances[u]:
@@ -81,31 +84,6 @@ class RoadNetworks:
                         heapq.heappush(priorityQ, (alt, v))
         return distances[destIntersectID]
 
-    def shortestPaths(self, source, destination):
-        distances = {intersectionID: float('inf') for intersectionID in self.intersections}
-        distances[source] = 0
-        priorityQ = [(0, source)]
-        visited = set()
-
-        while priorityQ:
-            distU, u = heapq.heappop(priorityQ)
-            if u in visited:
-                continue
-            visited.add(u)
-
-            if u == destination:
-                break
-
-            for roadID, road in self.roads.items():
-                if road.sourceIntersect == u:
-                    v = road.destIntersect
-                    alt = distU + road.length
-                    if alt < distances[v]:
-                        distances[v] = alt
-                        heapq.heappush(priorityQ, (alt, v))
-
-        return distances[destination]
-
     def distributePackages(self):
         for houseID, house in self.houses.items():
             shortestDist = float('inf')
@@ -115,29 +93,21 @@ class RoadNetworks:
                 if distance < shortestDist:
                     shortestDist = distance
                     closestIntersect = intersectionID
-            print(f"Package for house {houseID} should be delivered from intersection {closestIntersect}")
+            print(f"The shortest distance from intersection {intersectionID} to house {houseID} is: {distance}")
 
 def plotGraph(roadNetwork):
-    fig, ax = plt.subplots()
+    G = nx.Graph()
+    for intersectionID in roadNetwork.intersections:
+        G.add_node(intersectionID, color='green', marker='s', label=f'Intersection {intersectionID}')
 
-    # Plot intersections as squares
-    for intersectionID, intersection in roadNetwork.intersections.items():
-        ax.scatter(intersectionID, 0, color='green', marker='s', label=f'Intersection {intersectionID}')
+    for houseID in roadNetwork.houses:
+        G.add_node(houseID, color='red', marker='^', label=f'House {houseID}')
 
-    # Plot houses as triangles
-    for houseID, house in roadNetwork.houses.items():
-        ax.scatter(houseID, 0, color='red', marker='^', label=f'House {houseID}')
-
-    # Plot roads as lines
     for roadID, road in roadNetwork.roads.items():
-        sourceIntersect = road.sourceIntersect
-        destIntersect = road.destIntersect
-        ax.plot([sourceIntersect, destIntersect], [0, 0], color='black', linestyle='-', linewidth=1,
-                label=f'Road {roadID}')
+        G.add_edge(road.sourceIntersect, road.destIntersect, label=f'Road {roadID}')
 
-    ax.set_xlabel('Node ID')
-    ax.set_ylabel('Y')
-    ax.set_title('Road Network Graph')
-    ax.legend()
+    pos = nx.spring_layout(G)
+    nx.draw(G, pos, with_labels=True)
+    edge_labels = nx.get_edge_attributes(G, 'label')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
     plt.show()
-plotGraph(roadNetwork)
