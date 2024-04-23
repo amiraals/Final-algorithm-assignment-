@@ -102,12 +102,14 @@ def display_all_posts(posts):
         print("No posts available.")
 
 
+# Function to create a max heap of posts based on views
 def create_max_heap(posts):
     max_heap = []
     for post in posts:
         heapq.heappush(max_heap, (-post.views, post))  # Use negative views for max heap
     return max_heap
 
+# Function to find the post with the most views from the max heap
 def find_post_with_most_views(max_heap):
     if max_heap:
         views, post = max_heap[0]
