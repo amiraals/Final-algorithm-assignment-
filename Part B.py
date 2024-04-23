@@ -63,11 +63,8 @@ class RoadNetworks:
             return None
 
     def shortestDist(self, sourceIntersectID, destIntersectID):
-        distances = {}
-        for intersectionID in self.intersections:
-            distances[intersectionID] = float('inf')
-        for houseID in self.houses:
-            distances[houseID] = float('inf')
+        distances = {intersectionID: float('inf') for intersectionID in self.intersections}
+        distances.update({houseID: float('inf') for houseID in self.houses})
         distances[sourceIntersectID] = 0
         priorityQ = [(0, sourceIntersectID)]
 
@@ -94,6 +91,31 @@ class RoadNetworks:
                     shortestDist = distance
                     closestIntersect = intersectionID
             print(f"The shortest distance from intersection {intersectionID} to house {houseID} is: {distance}")
+
+    def dijkstra_shortest_path(self, sourceIntersectID, destIntersectID):
+        distances = {intersectionID: float('inf') for intersectionID in self.intersections}
+        distances[sourceIntersectID] = 0
+        visited = set()
+        priorityQ = [(0, sourceIntersectID)]
+
+        while priorityQ:
+            distU, u = heapq.heappop(priorityQ)
+            if u in visited:
+                continue
+            visited.add(u)
+            if u == destIntersectID:
+                return distances[destIntersectID]
+            for roadID, road in self.roads.items():
+                if road.sourceIntersect == u:
+                    v = road.destIntersect
+                    alt = distU + road.length
+                    if alt < distances[v]:
+                        distances[v] = alt
+                        heapq.heappush(priorityQ, (alt, v))
+        return float('inf')
+
+    def shortestDist(self, sourceIntersectID, destIntersectID):
+        return self.dijkstra_shortest_path(sourceIntersectID, destIntersectID)
 
 def plotGraph(roadNetwork):
     G = nx.Graph()
