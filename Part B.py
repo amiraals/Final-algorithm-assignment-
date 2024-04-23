@@ -3,10 +3,16 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 class Intersections:
+    """
+    This class represents the intersections in a road network
+    """
     def __init__(self, intersectionID):
         self.intersectionID = intersectionID
 
 class Roads:
+    """
+    This class represents roads connecting intersections in a road network
+    """
     def __init__(self, roadID, sourceIntersect, destIntersect, roadName, length):
         self.roadID = roadID
         self.sourceIntersect = sourceIntersect
@@ -15,37 +21,44 @@ class Roads:
         self.length = length
 
 class Houses:
+    """
+    This class represents the houses in a road network
+    """
     def __init__(self, houseID):
         self.houseID = houseID
 
 class RoadNetworks:
+    """
+    This class represents a road network which manages the intersections, roads, and houses in the road network
+    """
     def __init__(self):
         self.intersections = {}
         self.roads = {}
         self.houses = {}
+    def addIntersection(self, intersectionID):  # Method to add an intersection to the road network
+        if intersectionID not in self.intersections:  # Check if intersectionID is not already in the intersections dictionary
+            self.intersections[intersectionID] = Intersections(intersectionID)  # If its not in the dictionary add it to intersections dictionary with an Intersection object
 
-    def addIntersection(self, intersectionID):
-        if intersectionID not in self.intersections:
-            self.intersections[intersectionID] = Intersections(intersectionID)
+    def addRoad(self, roadID, sourceIntersectID, destIntersectID, roadName, length):  # Method to add a road to the road network
+        self.addIntersection(sourceIntersectID)  # Make sure the source intersection is added to the road network
+        self.addIntersection(destIntersectID)  # Make sure the destination intersection is added to the road network
+        self.roads[roadID] = Roads(roadID, sourceIntersectID, destIntersectID, roadName, length)  # Add the road to the roads dictionary with a Roads object
 
-    def addRoad(self, roadID, sourceIntersectID, destIntersectID, roadName, length):
-        self.addIntersection(sourceIntersectID)
-        self.addIntersection(destIntersectID)
-        self.roads[roadID] = Roads(roadID, sourceIntersectID, destIntersectID, roadName, length)
+    def addHouse(self, houseID):  # Method to add a house to the road network
+        if houseID not in self.houses:  # Check if houseID is not in the houses dictionary
+            self.houses[houseID] = Houses(houseID)  # Add houseID to the houses dictionary with a Houses object
 
-    def addHouse(self, houseID):
-        if houseID not in self.houses:
-            self.houses[houseID] = Houses(houseID)
-
-    def addPackage(self, houseID, intersectionID):
-        self.addHouse(houseID)
-        self.addIntersection(intersectionID)
+    def addPackage(self, houseID, intersectionID):  # Method to add a package delivery point to the road network
+        self.addHouse(houseID)  # Make sure that the house is added to the road network
+        self.addIntersection(intersectionID)  # Make sure the intersection is added to the road network
+        # Add the package delivery point to the roads dictionary with a Roads object
         self.roads[f'package_{houseID}_{intersectionID}'] = Roads(f'package_{houseID}_{intersectionID}', intersectionID, houseID, 'Package Delivery', 0.001)
-
-    def getRoadInfo(self, roadID):
-        road = self.roads.get(roadID)
-        if road:
-            return {
+        
+    def getRoadInfo(self, roadID):  # Method to get information about a road
+        road = self.roads.get(roadID)  # Get the road object from the roads dictionary using the roadID
+        if road:  # Check if road object exists
+            # If the road exists, return a dictionary containing information about the road
+            return {  
                 'Road ID': road.roadID,
                 'Source Intersection': road.sourceIntersect,
                 'Destination Intersection': road.destIntersect,
@@ -53,41 +66,41 @@ class RoadNetworks:
                 'Length': road.length
             }
         else:
-            return None
+            return None  # If it does not exist, return None
 
-    def getIntersectionInfo(self, intersectionID):
-        intersection = self.intersections.get(intersectionID)
-        if intersection:
-            return {'intersection ID': intersection.intersectionID}
+    def getIntersectionInfo(self, intersectionID):  # Method to get information about an intersection
+        intersection = self.intersections.get(intersectionID)  # Get the intersection object from the intersections dictionary using the intersectionID
+        if intersection:  # Check if the intersection object exists
+            return {'intersection ID': intersection.intersectionID}  # If the intersection exists, return a dictionary with information about the intersection
         else:
-            return None
-
-    def dijkstra_shortest_path(self, sourceIntersectID, destIntersectID):
-        distances = {intersectionID: float('inf') for intersectionID in self.intersections}
-        distances[sourceIntersectID] = 0
-        visited = set()
-        priorityQ = [(0, sourceIntersectID)]
+            return None  # If it does not exist, return None
+            
+    def dijkstra_shortest_path(self, sourceIntersectID, destIntersectID):  # Dijkstra's algorithm to find shortest distance between intersections
+        distances = {intersectionID: float('inf') for intersectionID in self.intersections}  # Initialize distances to infinity
+        distances[sourceIntersectID] = 0  # Set distance to source intersection to 0
+        visited = set()  # Create a set to keep track of visited intersections
+        priorityQ = [(0, sourceIntersectID)]  # Priority queue with source intersection and distance 0
 
         while priorityQ:
-            distU, u = heapq.heappop(priorityQ)
-            if u in visited:
+            distU, u = heapq.heappop(priorityQ)  # Pop intersection with smallest distance from priority queue
+            if u in visited:  # Skip if intersection visited
                 continue
-            visited.add(u)
-            if u == destIntersectID:
-                return distances[destIntersectID]
-            for roadID, road in self.roads.items():
-                if road.sourceIntersect == u:
-                    v = road.destIntersect
-                    alt = distU + road.length
-                    if alt < distances[v]:
+            visited.add(u)  # Mark as visited
+            if u == destIntersectID:  # Check if destination intersection is reached
+                return distances[destIntersectID]  # Return shortest distance to destination
+            for roadID, road in self.roads.items(): 
+                if road.sourceIntersect == u:  # Check if road starts at current intersection
+                    v = road.destIntersect  # Get destination intersection
+                    alt = distU + road.length  # Calculate alternative distance
+                    if alt < distances[v]:  # Update distance if shorter
                         distances[v] = alt
-                        heapq.heappush(priorityQ, (alt, v))
-        return float('inf')
+                        heapq.heappush(priorityQ, (alt, v))  # Push updated distance to priority queue
+        return float('inf')  # Return infinity if destination is unreachable
 
-    def shortestDist(self, sourceIntersectID, destIntersectID):
+    def shortestDist(self, sourceIntersectID, destIntersectID): # Method to calculate the shortest distance between two intersections
         return self.dijkstra_shortest_path(sourceIntersectID, destIntersectID)
 
-    def distributePackages(self):
+    def distributePackages(self): # Method to distribute packages to the nearest intersection
         for houseID, house in self.houses.items():
             shortestDist = float('inf')
             closestIntersect = None
@@ -98,7 +111,7 @@ class RoadNetworks:
                     closestIntersect = intersectionID
             print(f"The shortest distance from intersection {intersectionID} to house {houseID} is: {distance}")
 
-def plotGraph(roadNetwork):
+def plotGraph(roadNetwork): # Plots the road network graph
     G = nx.Graph()
     for intersectionID in roadNetwork.intersections:
         G.add_node(intersectionID, color='green')
