@@ -101,6 +101,7 @@ class RoadNetworks:
         return self.dijkstra_shortest_path(sourceIntersectID, destIntersectID)
 
     def distributePackages(self): # Method to distribute packages to the nearest intersection
+        # Assign packages to intersections based on shortest paths to houses
         for houseID, house in self.houses.items():
             shortestDist = float('inf')
             closestIntersect = None
