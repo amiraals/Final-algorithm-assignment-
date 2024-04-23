@@ -1,21 +1,18 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
-# Define the range of data set sizes
-data_set_sizes = list(range(1, 1001))
+# Number of posts (n)
+n = np.arange(1, 1001, 10)
 
-# Define the constant time complexity (O(1)) for hash table find operation
-time_complexity = [1] * len(data_set_sizes)
+# Time complexity for creating max heap (O(n log n))
+time_complexity = n * np.log(n)
 
-# Plot the time complexity graph
+# Plotting the graph
 plt.figure(figsize=(10, 6))
-plt.plot(data_set_sizes, time_complexity, label='Hash Table (O(1))', color='blue')
-
-# Add labels and title
-plt.title('Time Complexity of Hash Table for Finding a Post by Datetime')
-plt.xlabel('Size of Data Set')
-plt.ylabel('Time Complexity (O(1))')
-plt.legend()
+plt.plot(n, time_complexity, label='O(n log n)', color='blue')
+plt.title('Time Complexity of Creating Max Heap')
+plt.xlabel('Number of Posts (n)')
+plt.ylabel('Time Complexity')
 plt.grid(True)
-
-# Show the graph
+plt.legend()
 plt.show()
