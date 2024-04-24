@@ -3,16 +3,12 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 class Intersections:
-    """
-    This class represents the intersections in a road network
-    """
+    # This class represents the intersections in a road network
     def __init__(self, intersectionID):
         self.intersectionID = intersectionID
 
 class Roads:
-    """
-    This class represents roads connecting intersections in a road network
-    """
+    # This class represents roads connecting intersections in a road network
     def __init__(self, roadID, sourceIntersect, destIntersect, roadName, length):
         self.roadID = roadID
         self.sourceIntersect = sourceIntersect
@@ -21,20 +17,17 @@ class Roads:
         self.length = length
 
 class Houses:
-    """
-    This class represents the houses in a road network
-    """
+    # This class represents the houses in a road network
     def __init__(self, houseID):
         self.houseID = houseID
 
 class RoadNetworks:
-    """
-    This class represents a road network which manages the intersections, roads, and houses in the road network
-    """
+    # This class represents a road network which manages the intersections, roads, and houses in the road network
     def __init__(self):
         self.intersections = {}
         self.roads = {}
         self.houses = {}
+    
     def addIntersection(self, intersectionID):  # Method to add an intersection to the road network
         if intersectionID not in self.intersections:  # Check if intersectionID is not already in the intersections dictionary
             self.intersections[intersectionID] = Intersections(intersectionID)  # If its not in the dictionary add it to intersections dictionary with an Intersection object
