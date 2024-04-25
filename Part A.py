@@ -205,8 +205,14 @@ def run_menu(post_dict, root, max_heap, posts):
 def main():
     num_posts = int(input("Enter the number of posts to generate: "))
     posts = generate_random_posts(num_posts)
+
+    # Check if no posts were generated and exit if true
+    if not posts:
+        print("No posts generated. Exiting the program..")
+        return  # This will exit the main function, effectively ending the program
+
     display_all_posts(posts)
     post_dict, root, max_heap = create_data_structures(posts)
-    run_menu(post_dict, root, max_heap, posts) 
+    run_menu(post_dict, root, max_heap, posts)
 
 main()
