@@ -1,6 +1,7 @@
 import heapq
 import matplotlib.pyplot as plt
 import networkx as nx
+import time
 
 class Intersections:
     # This class represents the intersections in a road network
